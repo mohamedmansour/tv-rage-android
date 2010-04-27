@@ -17,24 +17,22 @@ public class TVRageService {
   private static final String TAG = "TVRageService";
 
   private final String url;
-  private final boolean showAllWeek;
   
-  private List<TVShow> shows = new ArrayList<TVShow>();
+  private ArrayList<ArrayList<TVShow>> shows = new ArrayList<ArrayList<TVShow>>();
   
   public TVRageService(String url, String lang, boolean showAllWeek) {
     this.url = url + lang;
-    Log.d(TAG, url);
-    this.showAllWeek = showAllWeek;
+    Log.d(TAG, this.url);
   }
 
   public void fetchSchedule() {
     // In case running it again.
     shows.clear();
+    ArrayList<TVShow> dayShows = null;
     try {
       URL url = new URL(this.url);
       BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
       String str = null;
-      boolean dayFound = false;
       while ((str = in.readLine()) != null) {
         Pattern p = Pattern.compile("\\[(DAY|TIME|SHOW)\\](.*?)\\[/\\1]");
         Matcher m = p.matcher(str);
@@ -43,17 +41,15 @@ public class TVRageService {
           String content = m.group(2);
           if (type == TVRow.SHOW) {
             String[] showArr = content.split("\\^");
-            shows.add(new TVShow(type, showArr[0], showArr[1], showArr[2], showArr[3]));
+            dayShows.add(new TVShow(type, showArr[0], showArr[1], showArr[2], showArr[3]));
           } else if (type == TVRow.DAY) {
-            if (dayFound && !showAllWeek) {
-              break;
+            if (dayShows != null) {
+              shows.add(dayShows);
             }
-            if (!dayFound) {
-              dayFound = true;
-            }
-            shows.add(new TVShow(type, content));
+            dayShows = new ArrayList<TVShow>();
+            dayShows.add(new TVShow(type, content));
           } else if (type == TVRow.TIME) {
-            shows.add(new TVShow(type, content));
+            dayShows.add(new TVShow(type, content));
           }
         }
       }
@@ -63,10 +59,28 @@ public class TVRageService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    if (dayShows != null) {
+      if (dayShows.size() == 0) {
+        dayShows.add(new TVShow(TVRow.SHOW, "None"));
+      }
+      shows.add(dayShows);
+    }
+    
     Log.d(TAG, "Processed " + shows.size() + " shows!");
   }
   
-  public List<TVShow> getShows() {
-    return shows;
+  public List<TVShow> getDayShows() {
+    if (shows.size() == 0)
+      return new ArrayList<TVShow>();
+    return shows.get(0);
+  }
+  
+  public List<TVShow> getWeekShows() {
+    ArrayList<TVShow> allShows = new ArrayList<TVShow>();
+    for (ArrayList<TVShow> dayShow : shows) {
+      allShows.addAll(dayShow);
+    }
+    return allShows;
   }
 }

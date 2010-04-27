@@ -7,7 +7,6 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +54,7 @@ public class TVRageAndroid extends ListActivity {
     String lang = items[settings.getInt(PREF_COUNTRY, 0)];
     TVRageService service = new TVRageService(url, lang, false);
     service.fetchSchedule();
-    return service.getShows();
+    return service.getDayShows();
   }
   
   @Override
@@ -67,6 +66,9 @@ public class TVRageAndroid extends ListActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch(item.getItemId()) {
+    case R.id.refresh:
+      doRefresh();
+      return true;
     case R.id.settings:
       displaySettings();
       return true;
@@ -79,7 +81,13 @@ public class TVRageAndroid extends ListActivity {
     }
     return false;
   }
-
+  
+  private void doRefresh() {
+    TVRageListAdapter adapter = (TVRageListAdapter)getListAdapter();
+    adapter.clear();
+    adapter.addList(getSchedule());
+  }
+  
   private void doQuit() {
     TVRageAndroid.this.finish();
   }
@@ -109,9 +117,7 @@ public class TVRageAndroid extends ListActivity {
                   editor.commit();
                   dialog.dismiss();
 
-                  TVRageListAdapter adapter = (TVRageListAdapter)getListAdapter();
-                  adapter.clear();
-                  adapter.addList(getSchedule());
+                  doRefresh();
                   
                   String dismiss_toast = items[item] + " " +
                       getResources().getString(R.string.settings_saved);
