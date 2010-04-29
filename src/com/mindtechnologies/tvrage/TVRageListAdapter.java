@@ -34,11 +34,7 @@ public class TVRageListAdapter extends ArrayAdapter<TVShow> {
       view = (TextView) inflater.inflate(R.layout.list_separator, parent, false);
       view.setText(showItem.getName());
       break;
-    case DAY:
-      view = (TextView) inflater.inflate(R.layout.list_header, parent, false);
-      view.setText(showItem.getName());
-      break;
-    case SHOW:
+    default:
       view = (TextView) inflater.inflate(R.layout.list_item, parent, false);
       view.setText(showItem.toString());
       break;

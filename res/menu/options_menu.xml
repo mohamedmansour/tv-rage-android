@@ -5,6 +5,4 @@
           android:title="Settings" android:alphabeticShortcut="s"/>
     <item android:id="@+id/about"
           android:title="About" android:alphabeticShortcut="a"/>
-    <item android:id="@+id/quit"
-          android:title="Quit" android:alphabeticShortcut="q" />
 </menu>
