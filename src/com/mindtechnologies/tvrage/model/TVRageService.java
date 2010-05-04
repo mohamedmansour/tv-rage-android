@@ -1,9 +1,7 @@
 package com.mindtechnologies.tvrage.model;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -61,7 +59,7 @@ public class TVRageService {
         // Checks for tags that start with DAY, TIME, and SHOW that have the
         // following format "[DAY] ... [/DAY]"
         Pattern p = Pattern.compile("\\[(DAY|TIME|SHOW)\\](.*?)\\[/\\1]");
-        Matcher m = p.matcher(str);
+        Matcher m = p.matcher(str.trim());
         if (m.matches()) {
           // Parse out the groupings for what we matched.
           TVRow type = TVRow.valueOf(m.group(1));
@@ -88,22 +86,18 @@ public class TVRageService {
         }
       }
       in.close();
-    } catch (MalformedURLException e) {
-      Log.e(TAG, e.getMessage());
-    } catch (IOException e) {
-      Log.e(TAG, e.getMessage());
+    } catch (Exception e) {
+      Log.e(TAG, e.getMessage(), e);
     }
     
     // Handle the case where overflows occur and add them back to the newest
     // bucket. This case should always happen at the end of any TIME groupings.
     if (tvDay != null) {
       if (tvDay.isEmpty()) {
-        tvDay.addShow(new TVShow(TVRow.SHOW, "None"));
+        tvDay.addShow(new TVShow(TVRow.TIME, "None"));
       }
       shows.add(tvDay);
     }
-    
-    Log.d(TAG, "Processed " + shows.size() + " shows for " + tvDay.getText());
   }
   
   /**
@@ -112,11 +106,20 @@ public class TVRageService {
    * @return the TV shows for the returned day.
    */
   public TVDay getDayShows(int index) {
-    if (shows.size() == 0) {
-      TVDay errorDay = new TVDay("Service Error");
-      errorDay.addShow(new TVShow(TVRow.SHOW, "Cannot fetch tv service"));
+    int size = shows.size();
+    if (size == 0 || index > size - 1) {
+      TVDay errorDay = new TVDay("Connection Error");
+      errorDay.addShow(new TVShow(TVRow.TIME, "Must have internet connectivity!"));
       return errorDay;
     }
     return shows.get(index);
+  }
+  
+  /**
+   * All the shows of the week.
+   * @return an array list of shows for every day.
+   */
+  public ArrayList<TVDay> getShows() {
+    return shows;
   }
 }

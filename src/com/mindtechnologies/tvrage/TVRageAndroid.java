@@ -28,6 +28,7 @@ import com.mindtechnologies.tvrage.model.TVRageService;
  * @since 2010-04-30
  */
 public class TVRageAndroid extends Activity implements OnItemClickListener, OnClickListener {
+  private static final String TAG = "TVRageService";
   private static final String SETTINGS = "MySettingsFile";
   private static final String PREF_COUNTRY = "country";
   private String[] items;
@@ -55,9 +56,6 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
     // Add click listeners for the next/previous buttons. 
     getPreviousDayButton().setOnClickListener(this);
     getNextDayButton().setOnClickListener(this);
-    
-    // Disable the previous day button because we are starting at index 0.
-    getPreviousDayButton().setEnabled(false);
   }
 
   @Override
@@ -199,6 +197,17 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
     getHeaderView().setText(dayShows.getText());
     TVRageListAdapter adapter = (TVRageListAdapter)getListView().getAdapter();
     adapter.setShows(dayShows.getShows());
+    
+    // Disable the previous day button if we are starting at index 0.
+    if (day_view_index == 0) {
+      getPreviousDayButton().setEnabled(false);
+    }
+    
+    // If no shows exist, that implies some sort of connection error.
+    if (service.getShows().size() == 0) {
+      getPreviousDayButton().setEnabled(false);
+      getNextDayButton().setEnabled(false);
+    }
   }
 
   /**
