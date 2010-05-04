@@ -1,42 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent" 
-              android:layout_height="fill_parent"
-              android:layout_weight="0" 
-              android:orientation="vertical" >
-    <LinearLayout android:layout_width="fill_parent" 
-        android:layout_height="50dip"
-        android:layout_weight="1" 
-        android:orientation="horizontal"
-        android:background="@*android:color/darker_gray">
-      <ImageButton android:layout_width="wrap_content"
-          android:layout_height="fill_parent"
-          android:layout_weight="0"
-          android:id="@+id/previous_day"
-          android:adjustViewBounds="true"
-          android:src="@*android:drawable/ic_media_previous" />
-	  <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-	      style="?android:attr/listSeparatorTextViewStyle"
-	      android:id="@+id/day_header"
-	      android:textColor="@*android:color/black"
-	      android:textStyle="bold"
-	      android:textSize="14sp"
-	      android:gravity="center"
-	      android:background="@*android:color/darker_gray"
-	      android:layout_height="25dip"
-	      android:layout_width="fill_parent"
-	      android:layout_weight="1" />
-      <ImageButton android:layout_width="wrap_content"
-          android:layout_height="fill_parent"
-          android:layout_weight="0" 
-          android:id="@+id/next_day"
-          android:adjustViewBounds="true"
-          android:src="@*android:drawable/ic_media_next" />
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:layout_weight="0" android:orientation="vertical">
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="75dip" android:layout_weight="1" android:paddingTop="3px"
+		android:orientation="horizontal" android:background="@*android:color/darker_gray">
+		<Button android:layout_width="wrap_content"
+			android:layout_height="fill_parent" android:layout_weight="0"
+			android:id="@+id/previous_day" android:text="&lt;" />
+		<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+			style="?android:attr/listSeparatorTextViewStyle" android:id="@+id/day_header"
+			android:textColor="@*android:color/black" android:textStyle="bold"
+			android:textSize="18sp" android:gravity="center" android:background="@*android:color/darker_gray"
+			android:layout_height="fill_parent" android:layout_width="fill_parent"
+			android:layout_weight="1" />
+		<Button android:layout_width="wrap_content"
+			android:layout_height="fill_parent" android:layout_weight="0"
+			android:id="@+id/next_day" android:text="&gt;" />
 	</LinearLayout>
 	<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:id="@+id/schedule_list"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="1"
-	    android:textSize="16sp" />
+		android:id="@+id/schedule_list" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:layout_weight="1"
+		android:textSize="16sp" />
 </LinearLayout>

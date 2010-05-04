@@ -11,16 +11,34 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+/**
+ * A custom list adapter that allows different row renders for the list view.
+ * Whenever a time is present, it will make the row darker, and all other entries
+ * lighter.
+ * 
+ * @author Mohamed Mansour
+ * @since 2010-04-30
+ */
 public class TVRageListAdapter extends ArrayAdapter<TVShow> {
   private LayoutInflater inflater;
   
-  public TVRageListAdapter(Context context, int viewId, List<TVShow> objects) {
-    super(context, viewId, objects);
+  /**
+   * Constructor that creates an adapter for the ListView.
+   * @param context the application context.
+   * @param viewId the view id of the list view to apply the adapter to. 
+   */
+  public TVRageListAdapter(Context context, int viewId) {
+    super(context, viewId);
     this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
   }
   
-  public void addList(List<TVShow> objects) {
-    for (TVShow show : objects) {
+  /**
+   * Inform the adapter that a new list of shows is present.
+   * @param shows
+   */
+  public void setShows(List<TVShow> shows) {
+    clear();
+    for (TVShow show : shows) {
       add(show);
     }
   }

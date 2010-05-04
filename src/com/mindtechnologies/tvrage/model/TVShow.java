@@ -1,5 +1,11 @@
 package com.mindtechnologies.tvrage.model;
 
+/**
+ * Representation of a TV Show.
+ * 
+ * @author Mohamed Mansour
+ * @since 2010-04-30
+ */
 public class TVShow {
   private final String network;
   private final String name;
