@@ -2,9 +2,11 @@ package com.mindtechnologies.tvrage;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,12 +29,14 @@ import com.mindtechnologies.tvrage.model.TVRageService;
  * @author Mohamed Mansour
  * @since 2010-04-30
  */
-public class TVRageAndroid extends Activity implements OnItemClickListener, OnClickListener {
-  private static final String TAG = "TVRageService";
+public class TVRageAndroid extends Activity implements OnItemClickListener,
+                                                       OnClickListener,
+                                                       Runnable {
   private static final String SETTINGS = "MySettingsFile";
   private static final String PREF_COUNTRY = "country";
   private String[] items;
   private TVRageService service;
+  private ProgressDialog progressDialog;
   private int day_view_index = 0;
   
   @Override
@@ -50,12 +54,13 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
     lv.setTextFilterEnabled(true);
     lv.setOnItemClickListener(this);
     
-    // Fetch a brand new schedule from the TV Rage REST service.
-    doRefresh(getFreshSchedule());
-    
     // Add click listeners for the next/previous buttons. 
     getPreviousDayButton().setOnClickListener(this);
     getNextDayButton().setOnClickListener(this);
+    
+    // Fetch a brand new schedule from the TV Rage REST service.
+    getHeaderView().setText(getResources().getString(R.string.loading));
+    fetchNewSchedule();
   }
 
   @Override
@@ -68,7 +73,7 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
   public boolean onOptionsItemSelected(MenuItem item) {
     switch(item.getItemId()) {
     case R.id.refresh:
-      doRefresh(getFreshSchedule());
+      fetchNewSchedule();
       return true;
     case R.id.settings:
       displaySettings();
@@ -119,7 +124,8 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
     }
     
     // Render the new day items to the list view.
-    doRefresh(service.getDayShows(--day_view_index));
+    day_view_index--;
+    doRefresh();
   }
 
   /**
@@ -142,7 +148,8 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
     }
     
     // Render the new day items to the list view.
-    doRefresh(service.getDayShows(++day_view_index));
+    day_view_index++;
+    doRefresh();
   }
 
   /**
@@ -179,21 +186,23 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
 
   /**
    * Inform the REST service that we need to fetch a brand new schedule.
-   * @return the requested day of shows.
    */
-  private TVDay getFreshSchedule() {
+  private void fetchNewSchedule() {
     SharedPreferences settings = getSharedPreferences(SETTINGS, 0);
     String lang = items[settings.getInt(PREF_COUNTRY, 0)];
     service.setLanguage(TVLanguage.valueOf(lang));
-    service.fetchSchedule();
-    return service.getDayShows(day_view_index);
+    progressDialog = ProgressDialog.show(this, "",
+        getResources().getString(R.string.loading_schedule),
+        true, false);
+    Thread thread = new Thread(this);
+    thread.start();
   }
 
   /**
    * Inform the ListView adapter that we have new shows to render.
-   * @param dayShows the day to render with new shows.
    */
-  private void doRefresh(TVDay dayShows) {
+  private void doRefresh() {
+    TVDay dayShows = service.getDayShows(day_view_index);
     getHeaderView().setText(dayShows.getText());
     TVRageListAdapter adapter = (TVRageListAdapter)getListView().getAdapter();
     adapter.setShows(dayShows.getShows());
@@ -243,17 +252,27 @@ public class TVRageAndroid extends Activity implements OnItemClickListener, OnCl
                   dialog.dismiss();
 
                   // Inform the ListView that we have new items.
-                  doRefresh(getFreshSchedule());
-                  
-                  // Show a toast that we saved successfully.
-                  String dismiss_toast = items[item] + " " +
-                      getResources().getString(R.string.settings_saved);
-                  Toast.makeText(getApplicationContext(),
-                                 dismiss_toast,
-                                 Toast.LENGTH_SHORT).show();
+                  fetchNewSchedule();
                 }
            })
            .create();
     builder.show();
   }
+
+  @Override
+  public void run() {
+    service.fetchSchedule();
+    progressHandler.sendEmptyMessage(0);
+  }
+  
+  /**
+   * Handle a progress handler in to the Message thread.
+   */
+  private Handler progressHandler = new Handler() {
+    @Override
+    public void handleMessage(android.os.Message msg) {
+      progressDialog.dismiss();
+      doRefresh();
+    };
+  };
 }
