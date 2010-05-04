@@ -6,4 +6,4 @@ TV Rage Guide Android App
 
 Download
 --------
-![Download TV Rage Guide](http://chart.apis.google.com/chart?cht=qr&chs=100x100&chl=market://search?q=pname:com.mindtechnologies.tvrage)
+![Download TV Rage Guide](http://chart.apis.google.com/chart?cht=qr&chs=200x200&chl=market://search?q=pname:com.mindtechnologies.tvrage)
