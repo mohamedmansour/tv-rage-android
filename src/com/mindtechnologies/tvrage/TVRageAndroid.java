@@ -1,5 +1,9 @@
 package com.mindtechnologies.tvrage;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -7,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +25,8 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.mindtechnologies.tvrage.model.TVDay;
 import com.mindtechnologies.tvrage.model.TVLanguage;
-import com.mindtechnologies.tvrage.model.TVRageService;
+import com.mindtechnologies.tvrage.service.TVRageCachedServiceImpl;
+import com.mindtechnologies.tvrage.service.TVRageService;
 
 /**
  * Main TV Rage Guide activity. This Android application only shows the new TV
@@ -32,12 +38,14 @@ import com.mindtechnologies.tvrage.model.TVRageService;
 public class TVRageAndroid extends Activity implements OnItemClickListener,
                                                        OnClickListener,
                                                        Runnable {
+  private static final String TAG = "TVRageAndroid";
   private static final String SETTINGS = "MySettingsFile";
   private static final String PREF_COUNTRY = "country";
   private String[] items;
   private TVRageService service;
   private ProgressDialog progressDialog;
   private int day_view_index = 0;
+  private boolean loaded = false;
   
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +53,7 @@ public class TVRageAndroid extends Activity implements OnItemClickListener,
     setContentView(R.layout.main);
     
     // Instantiate a new REST service and array of countries for settings.
-    service = new TVRageService(getResources().getString(R.string.tvrage_url));
+    service = new TVRageCachedServiceImpl(this);
     items = getResources().getStringArray(R.array.countries_array);
 
     // Setup the ListView of shows.
@@ -60,7 +68,11 @@ public class TVRageAndroid extends Activity implements OnItemClickListener,
     
     // Fetch a brand new schedule from the TV Rage REST service.
     getHeaderView().setText(getResources().getString(R.string.loading));
-    fetchNewSchedule();
+    
+    if (!loaded) {
+      fetchNewSchedule();
+      loaded = true;
+    }
   }
 
   @Override
@@ -203,7 +215,14 @@ public class TVRageAndroid extends Activity implements OnItemClickListener,
    */
   private void doRefresh() {
     TVDay dayShows = service.getDayShows(day_view_index);
-    getHeaderView().setText(dayShows.getText());
+    String dateText = dayShows.getDate();
+    try {
+      Date date = new SimpleDateFormat("yyyy-M-d").parse(dateText);
+      dateText = new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
+    } catch (ParseException e) {
+      Log.e(TAG, "Cannot format the date", e);
+    }
+    getHeaderView().setText(dateText);
     TVRageListAdapter adapter = (TVRageListAdapter)getListView().getAdapter();
     adapter.setShows(dayShows.getShows());
     

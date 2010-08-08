@@ -50,7 +50,7 @@ public class TVRageListAdapter extends ArrayAdapter<TVShow> {
     switch (showItem.getType()) {
     case TIME:
       view = (TextView) inflater.inflate(R.layout.list_separator, parent, false);
-      view.setText(showItem.getName());
+      view.setText(showItem.getTime());
       break;
     default:
       view = (TextView) inflater.inflate(R.layout.list_item, parent, false);

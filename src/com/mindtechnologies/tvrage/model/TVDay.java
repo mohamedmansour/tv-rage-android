@@ -1,6 +1,7 @@
 package com.mindtechnologies.tvrage.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a day full of shows.
@@ -9,23 +10,23 @@ import java.util.ArrayList;
  * @since 2010-04-30
  */
 public class TVDay {
-  private final String text;
-  private final ArrayList<TVShow> shows = new ArrayList<TVShow>();
+  private String date;
+  private List<TVShow> shows = new ArrayList<TVShow>();
   
   /**
    * Constructor that represents a new day.
    * @param text
    */
-  public TVDay(String text) {
-    this.text = text;
+  public TVDay(String date) {
+    this.date = date;
   }
   
   /**
    * The text of the day.
    * @return textual description of the day.
    */
-  public String getText() {
-    return text;
+  public String getDate() {
+    return date;
   }
   
   /**
@@ -40,7 +41,7 @@ public class TVDay {
    * The list of shows in the specified day.
    * @return all the aired shows during that day.
    */
-  public ArrayList<TVShow> getShows() {
+  public List<TVShow> getShows() {
     return shows;
   }
   

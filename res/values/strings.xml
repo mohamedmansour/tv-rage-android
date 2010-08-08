@@ -13,5 +13,6 @@
     <string name="about_title">About</string>
     <string name="about_description">Developed by Mohamed Mansour</string>
     <string name="ok">Ok</string>
-    <string name="tvrage_url">http://services.tvrage.com/tools/quickschedule.php?country=</string>
+    <string name="tvrage_url">http://services.tvrage.com/feeds/fullschedule.php?country=</string>
+    <string name="tvrage_show_url">http://services.tvrage.com/feeds/full_show_info.php?sid=</string>
 </resources>
