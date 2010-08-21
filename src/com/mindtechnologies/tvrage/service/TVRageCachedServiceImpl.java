@@ -41,6 +41,7 @@ public class TVRageCachedServiceImpl implements TVRageService {
   
   private TVLanguage lang;
   private Map<String, TVDay> shows;
+  private boolean forceInvalidate;
   
   public TVRageCachedServiceImpl(Context context) {
     this.scheduleUrl = context.getResources().getString(R.string.tvrage_url);
@@ -48,11 +49,13 @@ public class TVRageCachedServiceImpl implements TVRageService {
     this.context = context;
     this.shows = new HashMap<String, TVDay>();
     this.lang = TVLanguage.US;
+    this.forceInvalidate = false;
   }
   
   @Override
   public void setLanguage(TVLanguage lang) {
     this.lang = lang;
+    this.forceInvalidate = true;
   }
 
   @Override
@@ -64,8 +67,8 @@ public class TVRageCachedServiceImpl implements TVRageService {
   }
 
   @Override
-  public List<TVDay> getShows() {
-    return new ArrayList<TVDay>();
+  public Map<String, TVDay> getShows() {
+    return shows;
   }
 
   @Override
@@ -73,6 +76,7 @@ public class TVRageCachedServiceImpl implements TVRageService {
     // Check if the cache is valid. If any case of invalid cache, try to fetch
     // a new one from online. If that fails, delete the cache.
     if (!isCacheValid()) {
+      invalidateCache();
       if (!persistCache()) {
         invalidateCache();
         throw new RuntimeException("Service is unavailable. Please try again " +
@@ -87,6 +91,9 @@ public class TVRageCachedServiceImpl implements TVRageService {
    * @return true if the cache exists other wise can't find it in the system.
    */
   private boolean isCacheValid() {
+    if (forceInvalidate) {
+      return false;
+    }
     File cachedFile = context.getFileStreamPath(CACHE_FILE);
     return cachedFile.exists();
   }
@@ -122,10 +129,10 @@ public class TVRageCachedServiceImpl implements TVRageService {
         return false;
       }
       
-      // Persist it in a small buffer to improve performance by 3 times.
+      // Persist it 1024 bytes at a time.
       is = getInputStream(sheduleLocaleURL);
       int n;
-      byte[] buffer = new byte[32];
+      byte[] buffer = new byte[1024];
       try {
         while ((n = is.read(buffer)) >= 0) {
           fos.write(buffer, 0, n);
@@ -141,6 +148,7 @@ public class TVRageCachedServiceImpl implements TVRageService {
       Log.e(TAG, e.getMessage(), e);
       return false;
     }
+    forceInvalidate = false;
     return true;
   }
   
@@ -162,7 +170,6 @@ public class TVRageCachedServiceImpl implements TVRageService {
       if (is != null) try { is.close(); } catch (IOException e) {}
     }
   }
-  
   
   /**
    * Safely get the input stream.

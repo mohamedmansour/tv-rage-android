@@ -75,6 +75,6 @@ public class TVShow {
   
   @Override
   public String toString() {
-    return network + " - " + title + " "  + episode;
+    return network + " - " + name + " "  + episode;
   }
 }

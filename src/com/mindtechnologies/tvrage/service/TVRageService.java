@@ -1,6 +1,6 @@
 package com.mindtechnologies.tvrage.service;
 
-import java.util.List;
+import java.util.Map;
 
 import com.mindtechnologies.tvrage.model.TVDay;
 import com.mindtechnologies.tvrage.model.TVLanguage;
@@ -9,7 +9,8 @@ import com.mindtechnologies.tvrage.model.TVLanguage;
 public interface TVRageService {
 
   /**
-   * Sets the local language for the service.
+   * Sets the local language for the service. Invalidate cache to fetch a new
+   * document.
    * @param lang
    */
   public void setLanguage(TVLanguage valueOf);
@@ -25,7 +26,7 @@ public interface TVRageService {
    * All the shows of the week.
    * @return an array list of shows for every day.
    */
-  public List<TVDay> getShows();
+  public Map<String, TVDay> getShows();
   
   /**
    * Fetch a brand new schedule from TVRage public XML feed.

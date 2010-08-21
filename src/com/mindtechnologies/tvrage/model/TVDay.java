@@ -52,4 +52,9 @@ public class TVDay {
   public boolean isEmpty() {
     return shows.size() == 0;
   }
+  
+  @Override
+  public String toString() {
+    return date + " [" + shows.size() + " shows]";
+  }
 }

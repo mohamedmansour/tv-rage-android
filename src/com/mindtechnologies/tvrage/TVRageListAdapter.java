@@ -21,6 +21,7 @@ import android.widget.TextView;
  */
 public class TVRageListAdapter extends ArrayAdapter<TVShow> {
   private LayoutInflater inflater;
+  private List<TVShow> shows;
   
   /**
    * Constructor that creates an adapter for the ListView.
@@ -37,10 +38,23 @@ public class TVRageListAdapter extends ArrayAdapter<TVShow> {
    * @param shows
    */
   public void setShows(List<TVShow> shows) {
+    this.shows = shows;
     clear();
     for (TVShow show : shows) {
       add(show);
     }
+  }
+  
+  /**
+   * Get the TV Show for that position in the adapter.
+   * @param index The index to fetch for show.
+   * @return The show.
+   */
+  public TVShow getShow(int index) {
+    if (index < 0 || index > shows.size() - 1) {
+      throw new IllegalArgumentException("No show can be available at this index.");
+    }
+    return shows.get(index);
   }
   
   @Override

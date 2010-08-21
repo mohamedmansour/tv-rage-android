@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.util.Log;
@@ -15,8 +14,12 @@ import com.mindtechnologies.tvrage.model.TVDay;
 import com.mindtechnologies.tvrage.model.TVShow;
 import com.mindtechnologies.tvrage.model.TVShow.Builder;
 
-
-
+/**
+ * SAX Handler to parse the full schedule from TVRage XML Response. 
+ * 
+ * @author Mohamed Mansour
+ * @since 2010-08-19
+ */
 public class FullScheduleHandler extends DefaultHandler {
   private final static String TAG = "FullScheduleHandler";
   
@@ -41,11 +44,7 @@ public class FullScheduleHandler extends DefaultHandler {
   public Map<String, TVDay> getShows() {
     return shows;
   }
-  @Override
-  public void fatalError(SAXParseException e) throws SAXException {
-    // TODO Auto-generated method stub
-    super.fatalError(e);
-  }
+
   @Override
   public void startDocument() throws SAXException {
     shows = new HashMap<String, TVDay>();
